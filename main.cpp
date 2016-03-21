@@ -3,7 +3,7 @@
  Aldo Anaya
 */
 
-#include<stdio.h>
+//#include<stdio.h>
 #include<cstdlib>
 #include<cstdio>
 #include<stdlib.h>
@@ -11,35 +11,43 @@
 #include<errno.h>
 #include<string.h>
 #include<sys/types.h>
-#include<sys/socket.h>
-#include<netinet/in.h>
+//#include<sys/socket.h>
+//#include<netinet/in.h>
 #include<netdb.h>
 #include<arpa/inet.h>
 #include<sys/wait.h>
 #include<signal.h>
 #include<iostream>
+#include"cipher.h"
+#include"functions.h"
 
 // get sockaddr, IPv4 or IPv6
-
-void *get_in_addr(struct sockaddr *sa){
-	if(sa->sa_family == AF_INET){
-	return &(((struct sockaddr_in*)sa)->sin_addr);
-	}
-	return &(((struct sockaddr_in6*)sa)->sin6_addr);
-}
-
-void doConcurrent(int sockfd);
 
 #define MYPORT "23456"
 #define MAXBUFFLEN 100
 #define ADDR_LEN 50
 
+struct active_user{
+        std::string user;
+        struct sockaddr_storage addr;
+
+        active_user(std::string user1, struct sockaddr_storage addr1):
+         user(user1), addr(addr1) {}
+
+};
+
+
 int main(void){
-	int sockfd;
+
+
+	int sockfd, new_sockfd;
 	struct addrinfo hints, *servinfo, *p;
 	int numbytes;
 	int rv;
 	struct sockaddr_storage their_addr;
+	
+	active_user("", their_addr);
+	
 	char buf[MAXBUFFLEN];
 	char strptr[ADDR_LEN];
 	socklen_t addr_len;
@@ -60,7 +68,6 @@ int main(void){
 	for(p = servinfo;p != NULL; p=p->ai_next){
 		if((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
 			perror("UDP_Server: socket");
-			doConcurrent(sockfd);
 			continue;
 		}
 		if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1){
@@ -90,7 +97,10 @@ int main(void){
 			perror("\trecvfrom");
 			exit(1);
 		}
-		printf("\tUDP_Server: got packet from %s\n", inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr),strptr, sizeof strptr));
+		buf[numbytes] = '\0';
+		new_sockfd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_len);
+		
+		printf("\tUDP_Server: got packet from %s\n", inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr),strptr, addr_len));
 		printf("\tUDP_Server: packet is %d bytes long\n", numbytes);
 		buf[numbytes]='\0';
 		printf("\tUDP_Server:packet contains \"%s\"\n", buf);
@@ -102,4 +112,6 @@ int main(void){
 	close(sockfd);
 	return 0;
 }
+
+
 		
