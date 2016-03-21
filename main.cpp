@@ -91,6 +91,7 @@ int main(void){
 	freeaddrinfo(servinfo);
 	
 	while(1){
+		printf("working or not\n");
 		printf("\n");
 		addr_len = sizeof their_addr;
 		if((numbytes = recvfrom(sockfd, buf, MAXBUFFLEN-1, 0, (struct sockaddr *)&their_addr, &addr_len))== -1){
@@ -98,7 +99,7 @@ int main(void){
 			exit(1);
 		}
 		buf[numbytes] = '\0';
-		new_sockfd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_len);
+		// new_sockfd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_len);
 		
 		printf("\tUDP_Server: got packet from %s\n", inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr),strptr, addr_len));
 		printf("\tUDP_Server: packet is %d bytes long\n", numbytes);
@@ -108,6 +109,7 @@ int main(void){
 			perror("\tUDP_Server: sendto error");
 			exit(1);
 		}
+		printf("and here\n");
 	}
 	close(sockfd);
 	return 0;
