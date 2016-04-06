@@ -11,8 +11,7 @@
 #include<errno.h>
 #include<string.h>
 #include<sys/types.h>
-//#include<sys/socket.h>
-//#include<netinet/in.h>
+#include<vector>
 #include<netdb.h>
 #include<arpa/inet.h>
 #include<sys/wait.h>
@@ -39,15 +38,15 @@ struct active_user{
 
 int main(void){
 
-
-	int sockfd, new_sockfd;
+	printf("cool");
+	int sockfd;
 	struct addrinfo hints, *servinfo, *p;
 	int numbytes;
 	int rv;
 	struct sockaddr_storage their_addr;
 	
-	active_user("", their_addr);
-	
+	struct active_user first = active_user("", their_addr);
+	std::vector<active_user> users;
 	char buf[MAXBUFFLEN];
 	char strptr[ADDR_LEN];
 	socklen_t addr_len;
@@ -99,12 +98,12 @@ int main(void){
 			exit(1);
 		}
 		buf[numbytes] = '\0';
-		// new_sockfd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_len);
-		
+			
 		printf("\tUDP_Server: got packet from %s\n", inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr),strptr, addr_len));
 		printf("\tUDP_Server: packet is %d bytes long\n", numbytes);
 		buf[numbytes]='\0';
-		printf("\tUDP_Server:packet contains \"%s\"\n", buf);
+		std::string decrypted = decryptMessage(buf);
+		std::cout << "\tUDP_Server:packet contains " << decrypted << std::endl;
 		if((numbytes = sendto(sockfd, "Server", 6, 0, (struct sockaddr *)&their_addr, addr_len)) == -1) {
 			perror("\tUDP_Server: sendto error");
 			exit(1);

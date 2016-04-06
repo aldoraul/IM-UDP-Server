@@ -9,8 +9,11 @@
 #define _FUNCTIONS_H_INCLUDED_
 
 #include<netinet/in.h>
+#include<string>
+#include"cipher.h"
 
 void *get_in_addr(struct sockaddr *sa);
 
+std::string decryptMessage(std::string);
 
 #endif

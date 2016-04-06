@@ -4,7 +4,9 @@ DEBUG = -g
 CFLAGS = -Wall -c $(DEBUG)
 LFLAGS = -Wall $(DEBUG)
 
-server : $(OBJ)
+default: server
+
+server : $(OBJS)
 	$(CC) $(LFLAGS) $(OBJS) -o server
 
 main.o : main.cpp functions.h cipher.h
