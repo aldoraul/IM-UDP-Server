@@ -30,3 +30,19 @@ std::string decryptMessage(std::string buf){
 		buf[j] = decrypt(buf[j]);
 	return buf;
 }
+
+std::string get_user(std::string message){
+	int check_msg = 0;
+	int length = message.length();
+	int next = 0;
+	std::string name = "";
+	for(int i = 0; i < length; i++) {
+		if(message[i] == ';')
+			check_msg +=1;
+		if(check_msg == 2) {
+			next = i + 1;
+			break;
+		}
+	}
+	return message.substr(next, -1);
+}

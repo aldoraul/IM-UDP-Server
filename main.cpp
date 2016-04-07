@@ -45,7 +45,7 @@ int main(void){
 	int rv;
 	struct sockaddr_storage their_addr;
 	
-	struct active_user first = active_user("", their_addr);
+	struct active_user user = active_user("", their_addr);
 	std::vector<active_user> users;
 	char buf[MAXBUFFLEN];
 	char strptr[ADDR_LEN];
@@ -104,6 +104,7 @@ int main(void){
 		buf[numbytes]='\0';
 		std::string decrypted = decryptMessage(buf);
 		std::cout << "\tUDP_Server:packet contains " << decrypted << std::endl;
+		std::cout << "\tMessage sent to " << get_user(decrypted) << std::endl;
 		if((numbytes = sendto(sockfd, "Server", 6, 0, (struct sockaddr *)&their_addr, addr_len)) == -1) {
 			perror("\tUDP_Server: sendto error");
 			exit(1);
