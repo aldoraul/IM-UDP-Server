@@ -123,7 +123,21 @@ int main(void){
 				if((numbytes = sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)&their_addr, addr_len))==-1){
 					perror("\tUDP_Server: message1 sendto error");
 					exit(1);
-					}				
+					}
+				msg1 = "Users;1;";
+				msg_to_encrypt = userName + " just joined the group\n";
+				msgEncrypted = encryptMessage(msg_to_encrypt);
+				msg1 = msg1 + msgEncrypted;
+				message = new char[msg1.length() + 1];
+				strcpy(message, msg1.c_str());
+				for(std::vector<active_user>::iterator it = users.begin();it != users.end();it++){
+					if(userName != it->user){
+						if((numbytes = sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)&(it->addr), addr_len)) == -1){
+							perror("\tUDP_Server: joined message to active users error");
+							exit(1); 
+							}
+						}
+					}			
 				break;
 				}
 
