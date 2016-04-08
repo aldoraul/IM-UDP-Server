@@ -97,18 +97,20 @@ int main(void){
 		}
 		buf[numbytes] = '\0';
 		std::string decrypted = decryptMessage(buf);
-		int msg_num = getMsgType(decrypted);
+		int msg_type = getMsgType(decrypted);
+		int msg_num = getMsgNum(decrypted);
 		user = active_user(get_user(decrypted), their_addr);
 		users.push_back(user);
-		if((numbytes = sendto(sockfd, "Server", 6, 0, (struct sockaddr *)&their_addr, addr_len)) == -1) {
-			perror("\tUDP_Server: sendto error");
-			exit(1);
+		//if((numbytes = sendto(sockfd, "Server", 6, 0, (struct sockaddr *)&their_addr, addr_len)) == -1) {
+		//	perror("\tUDP_Server: sendto error");
+		//	exit(1);
+		//	}
+		printf("msg type %d \n", msg_type);
+		printf("msg num  %d \n", msg_num);
+		//for(std::vector<active_user>::iterator it = users.begin();it != users.end();it++){
+		//	std::cout<<"name " << it->user << std::endl;
+		//	}
 			}
-		printf("msg type %d \n", msg_num);
-		for(std::vector<active_user>::iterator it = users.begin();it != users.end();it++){
-			std::cout<<"name " << it->user << std::endl;
-			}
-		}
 	close(sockfd);
 	return 0;
 }

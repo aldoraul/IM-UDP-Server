@@ -59,3 +59,14 @@ int getMsgType(std::string message){
 		}
 	return num - '0';
 }
+
+int getMsgNum(std::string message){
+	std::string num = "";
+	int i = 0;	
+	while(message[i] != ';'){
+		num += message[i];
+		i++;
+		}
+	
+	return atoi(num.c_str());
+}

@@ -20,4 +20,6 @@ std::string get_user(std::string);
 
 int getMsgType(std::string);
 
+int getMsgNum(std::string);
+
 #endif
