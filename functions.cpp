@@ -30,6 +30,13 @@ std::string decryptMessage(std::string buf){
 		buf[j] = decrypt(buf[j]);
 	return buf;
 }
+std::string encryptMessage(std::string buf){
+	int length = buf.length();
+	for(int i = 0; i < length; i++){
+		buf[i] = encrypt(buf[i]);
+		}
+	return buf;
+}
 
 std::string get_user(std::string message){
 	int check_msg = 0;

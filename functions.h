@@ -16,6 +16,8 @@ void *get_in_addr(struct sockaddr *sa);
 
 std::string decryptMessage(std::string);
 
+std::string encryptMessage(std::string);
+
 std::string get_user(std::string);
 
 int getMsgType(std::string);
