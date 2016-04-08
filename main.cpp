@@ -96,20 +96,15 @@ int main(void){
 			exit(1);
 		}
 		buf[numbytes] = '\0';
-	
-		//printf("\tUDP_Server: got packet from %s\n", inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr),strptr, addr_len));
-		//printf("\tUDP_Server: packet is %d bytes long\n", numbytes);
 		std::string decrypted = decryptMessage(buf);
-		//std::cout << "\tUDP_Server:packet contains " << decrypted << std::endl;
-		//std::cout << "\tMessage sent to " << get_user(decrypted) << std::endl;
-		
+		int msg_num = getMsgType(decrypted);
 		user = active_user(get_user(decrypted), their_addr);
 		users.push_back(user);
 		if((numbytes = sendto(sockfd, "Server", 6, 0, (struct sockaddr *)&their_addr, addr_len)) == -1) {
 			perror("\tUDP_Server: sendto error");
 			exit(1);
 			}
-
+		printf("msg type %d \n", msg_num);
 		for(std::vector<active_user>::iterator it = users.begin();it != users.end();it++){
 			std::cout<<"name " << it->user << std::endl;
 			}

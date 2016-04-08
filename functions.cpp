@@ -6,7 +6,7 @@
 #include<stdio.h>
 //#include<netinet/in.h>
 #include"functions.h"
-
+#include<stdlib.h>
 void *get_in_addr(struct sockaddr *sa){
 	if(sa->sa_family == AF_INET){
 		return &(((struct sockaddr_in*)sa)->sin_addr);
@@ -45,4 +45,17 @@ std::string get_user(std::string message){
 		}
 	}
 	return message.substr(next, -1);
+}
+
+int getMsgType(std::string message){
+	int length = message.length();
+	char num;
+	for(int i = 0; i< length; i++) {
+		if(message[i] == ';'){
+			num = message[i+1];
+			break;
+			
+			}
+		}
+	return num - '0';
 }
