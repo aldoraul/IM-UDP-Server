@@ -156,7 +156,30 @@ int main(void){
 					perror("\tUDP_Server: message3 sendto error");
 					exit(1);
 					}
-				
+						
+				// Loop to take user out of list of active users
+				for(int i = 0; i <  (int)users.size();i++){
+					if(users[i].user == userName){
+						users.erase(users.begin()+i);
+						break;
+						}
+					}
+
+				msg1 = "Users;3;";
+				msg_to_encrypt = userName + " is leaving the group";
+				msgEncrypted = encryptMessage(msg_to_encrypt);
+				msg1 = msg1 + msgEncrypted;
+				message = new char[msg1.length()+1];
+				strcpy(message, msg1.c_str());
+				if(!users.empty()){
+					for(std::vector<active_user>::iterator it = users.begin();it != users.end();it++){
+						if((numbytes = sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)&(it->addr), addr_len)) == -1){
+						perror("\tUDP_Server: message3 sendto error");
+						exit(1);
+							}
+						}
+					}
+
 				break;
 				}
 			default:
