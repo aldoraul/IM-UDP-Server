@@ -48,7 +48,7 @@ int main(void){
 	struct active_user user = active_user("", their_addr);
 	std::vector<active_user> users;
 	char buf[MAXBUFFLEN];
-	char strptr[ADDR_LEN];
+	//char strptr[ADDR_LEN];
 	socklen_t addr_len;
 	int yes = 1;
 	
@@ -57,9 +57,9 @@ int main(void){
 
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_DGRAM;
-	hints.ai_flags = AI_PASSIVE;
+	//hints.ai_flags = AI_PASSIVE;
 
-	if((rv = getaddrinfo(NULL, MYPORT, &hints, &servinfo)) != 0){
+	if((rv = getaddrinfo("192.168.10.200", MYPORT, &hints, &servinfo)) != 0){
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
 		return 1;
 	}
@@ -90,8 +90,6 @@ int main(void){
 	freeaddrinfo(servinfo);
 	
 	while(1){
-		printf("working or not\n");
-		printf("\n");
 		addr_len = sizeof their_addr;
 		if((numbytes = recvfrom(sockfd, buf, MAXBUFFLEN-1, 0, (struct sockaddr *)&their_addr, &addr_len))== -1){
 			perror("\trecvfrom");
@@ -99,12 +97,11 @@ int main(void){
 		}
 		buf[numbytes] = '\0';
 	
-		printf("\tUDP_Server: got packet from %s\n", inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr),strptr, addr_len));
-		printf("\tUDP_Server: packet is %d bytes long\n", numbytes);
-		buf[numbytes]='\0';
+		//printf("\tUDP_Server: got packet from %s\n", inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr),strptr, addr_len));
+		//printf("\tUDP_Server: packet is %d bytes long\n", numbytes);
 		std::string decrypted = decryptMessage(buf);
-		std::cout << "\tUDP_Server:packet contains " << decrypted << std::endl;
-		std::cout << "\tMessage sent to " << get_user(decrypted) << std::endl;
+		//std::cout << "\tUDP_Server:packet contains " << decrypted << std::endl;
+		//std::cout << "\tMessage sent to " << get_user(decrypted) << std::endl;
 		
 		user = active_user(get_user(decrypted), their_addr);
 		users.push_back(user);
