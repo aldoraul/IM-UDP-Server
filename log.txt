@@ -1,2 +1,0 @@
-Received msg 15326: 15326;1;dave from 98.156.75.91 at Fri Apr  8 22:15:01 2016
-
