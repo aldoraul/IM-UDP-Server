@@ -185,7 +185,7 @@ int main(void){
 				message = new char[msg1.length() +1];
 				strcpy(message, msg1.c_str());
 				std::vector<active_user>::iterator it = users.begin();
-				while(it->user != buddyName)
+				while(it->user != buddyName && it != users.end())
 					it++;
 				if(it != users.end()){
 					if((numbytes = sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)&(it->addr), addr_len)) == -1){
