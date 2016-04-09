@@ -24,4 +24,8 @@ int getMsgType(std::string);
 
 int getMsgNum(std::string);
 
+std::string getBuddyName(std::string);
+
+std::string getMessage(std::string);
+
 #endif

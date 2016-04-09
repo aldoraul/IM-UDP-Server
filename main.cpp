@@ -19,9 +19,9 @@
 #include<iostream>
 #include"cipher.h"
 #include"functions.h"
-
-// get sockaddr, IPv4 or IPv6
-
+#include<iostream>
+#include<fstream>
+#include<ctime>
 #define MYPORT "23456"
 #define MAXBUFFLEN 100
 #define ADDR_LEN 50
@@ -38,7 +38,11 @@ struct active_user{
 
 int main(void){
 
-	printf("cool");
+	time_t t;
+	char* charTime;
+	std::ofstream myfile;
+	char s[INET6_ADDRSTRLEN];	
+
 	int sockfd;
 	struct addrinfo hints, *servinfo, *p;
 	int numbytes;
@@ -56,9 +60,9 @@ int main(void){
 
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_DGRAM;
-	//hints.ai_flags = AI_PASSIVE;
+	hints.ai_flags = AI_PASSIVE;
 
-	if((rv = getaddrinfo("192.168.10.200", MYPORT, &hints, &servinfo)) != 0){
+	if((rv = getaddrinfo(NULL, MYPORT, &hints, &servinfo)) != 0){
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
 		return 1;
 	}
@@ -89,6 +93,8 @@ int main(void){
 	freeaddrinfo(servinfo);
 	
 	while(1){
+		
+
 		addr_len = sizeof their_addr;
 		if((numbytes = recvfrom(sockfd, buf, MAXBUFFLEN-1, 0, (struct sockaddr *)&their_addr, &addr_len))== -1){
 			perror("\trecvfrom");
@@ -98,22 +104,32 @@ int main(void){
 		std::string decrypted = decryptMessage(buf);
 		int msg_type = getMsgType(decrypted);
 		int msg_num = getMsgNum(decrypted);
-		//if((numbytes = sendto(sockfd, "Server", 6, 0, (struct sockaddr *)&their_addr, addr_len)) == -1) {
-		//	perror("\tUDP_Server: sendto error");
-		//	exit(1);
-		//	}
-		printf("msg type %d \n", msg_type);
-		printf("msg num  %d \n", msg_num);
+		//printf("msg type %d \n", msg_type);
+		//printf("msg num  %d \n", msg_num);
 		std::string userName = get_user(decrypted);
 		
 		char *message;
 		std::string msg1 = "";
 		std::string msg_to_encrypt = "";
 		std::string msgEncrypted = "";
+		std::string buddyName = "";
+		std::string buddyMsg = "";
 		switch(msg_type){
 			case 1:{
+				
+				// write initial message from client to log
+				myfile.open("log.txt");
+				t = time(NULL);
+				charTime = ctime(&t);			
+				inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr),s, sizeof s);
+				myfile << "Received msg " << msg_num << ": " << decrypted << " from " << s << " at "<< charTime << "\n";	
+				myfile.close();
+				std::cout<< userName << " \n";		
+
+
+				// send ack to client along with list of active users
 				msg1 = "ack;" + std::to_string(msg_num) + ";";
-				msg_to_encrypt = "\nWelcome to the group " + userName +"\nMembers already loggen in are\n";
+				msg_to_encrypt = "\nWelcome to the group " + userName +"\nMembers already logged in are\n";
 				user = active_user(userName, their_addr);
 				users.push_back(user);
 				for(std::vector<active_user>::iterator it = users.begin();it != users.end();it++){
@@ -127,6 +143,9 @@ int main(void){
 					perror("\tUDP_Server: message1 sendto error");
 					exit(1);
 					}
+
+
+				// send msg to all active users about new client joining group
 				msg1 = "Users;1;";
 				msg_to_encrypt = userName + " just joined the group\n";
 				msgEncrypted = encryptMessage(msg_to_encrypt);
@@ -144,7 +163,38 @@ int main(void){
 				break;
 				}
 
-	//		case 2:
+			case 2:{
+				// send back ack for msg 2
+				msg1 = "ack;" + std::to_string(msg_num) + ";";	
+				message = new char[msg1.length() + 1];
+				strcpy(message, msg1.c_str());	
+				if((numbytes = sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)&their_addr, addr_len))==-1){
+					perror("\tUDP_Server: message1 sendto error");
+					exit(1);
+					}
+
+				buddyName = getBuddyName(decrypted);
+				buddyMsg = getMessage(decrypted);	
+				//std::cout<< "message is " << buddyMsg << " \n";
+				
+
+				msg1 = "Message;2;";
+				msg_to_encrypt = "\nFrom: " + userName + " To: " + buddyName + "\n" + buddyMsg + "\n";
+				msgEncrypted = encryptMessage(msg_to_encrypt);
+				msg1 += msgEncrypted;
+				message = new char[msg1.length() +1];
+				strcpy(message, msg1.c_str());
+				std::vector<active_user>::iterator it = users.begin();
+				while(it->user != buddyName)
+					it++;
+				if(it != users.end()){
+					if((numbytes = sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)&(it->addr), addr_len)) == -1){
+						perror("\tUDP_Server: message to buddy error");
+						exit(1);
+						}
+					 }
+				break;					
+				}
 			case 3:{
 				msg1 = "ack;"+ std::to_string(msg_num) + ";";
 				msg_to_encrypt = "Goodbye, " + userName;
@@ -185,12 +235,13 @@ int main(void){
 			default:
 				printf("not 1 2 or 3");			
 			}
-
+		delete[] message;	
 		}
 
 		//for(std::vector<active_user>::iterator it = users.begin();it != users.end();it++){
 		//	std::cout<<"name " << it->user << std::endl;
 		//	}
+
 	close(sockfd);
 	return 0;
 }

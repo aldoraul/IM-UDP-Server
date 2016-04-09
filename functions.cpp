@@ -4,7 +4,6 @@
 */
 
 #include<stdio.h>
-//#include<netinet/in.h>
 #include"functions.h"
 #include<stdlib.h>
 void *get_in_addr(struct sockaddr *sa){
@@ -51,7 +50,13 @@ std::string get_user(std::string message){
 			break;
 		}
 	}
-	return message.substr(next, -1);
+	while((message[next] != '\n') && (next < length)){
+		name += message[next];
+		next++;
+		}
+
+
+	return name;
 }
 
 int getMsgType(std::string message){
@@ -76,4 +81,35 @@ int getMsgNum(std::string message){
 		}
 	
 	return atoi(num.c_str());
+}
+
+std::string getBuddyName(std::string message){
+	std::string buddy = "";
+	int check = 0;
+	for(int i = 0; i < message.length();i++){
+		if(message[i] == '\n'){
+			check = i+1;
+			break;
+			}
+		}
+	while(message[check] != '\n'){
+		buddy += message[check];
+		check++; 
+		}
+	return buddy;
+}
+
+std::string getMessage(std::string message){
+	std::string msg = "";
+	int check = 0;
+	int i = 0;
+	do{
+		if(message[i] == '\n')
+			check++;
+		i++;
+		}while(check != 2);
+	for(int j = i; j < message.length();j++){
+		msg += message[j];
+		}
+	return msg;
 }
