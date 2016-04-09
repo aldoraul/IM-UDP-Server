@@ -1,0 +1,22 @@
+	By Aldo Anaya
+
+	README
+
+	This program is the server side implemtation of a UDP instant messaging applicaiton.  This program 
+	is to be run in a linux enviorment.  First the user, from the command line must use the "make" command.
+	This insures that the program is built and ready for use.  then type ./server from the directory in which
+	the program is stored.  this begins the server side of the instanst messaging program.  Clients for the 
+	instant messaging program will be able to log in and out and send messages to one another while the 
+	server plays mediator between the clients.  to end the program one must use control-c.  
+
+	OS
+	Ubuntu Server 15.10
+
+	Text Editor
+	Vim
+
+	Language
+	C++
+
+	Compiler
+	g++ -std=c++11 
