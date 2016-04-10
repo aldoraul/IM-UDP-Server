@@ -42,7 +42,7 @@ int main(void){
 	char* charTime;
 	std::ofstream myfile;
 	char s[INET6_ADDRSTRLEN];	
-
+	int slotNum = 1;
 	int sockfd;
 	struct addrinfo hints, *servinfo, *p;
 	int numbytes;
@@ -114,17 +114,21 @@ int main(void){
 		std::string msgEncrypted = "";
 		std::string buddyName = "";
 		std::string buddyMsg = "";
+	//	myfile.open("log.txt");
+	//	myfile.close();
+
+		inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr),s, sizeof s);
 		switch(msg_type){
 			case 1:{
 				
 				// write initial message from client to log
-				myfile.open("log.txt");
+				myfile.open("log.txt",std::fstream::app);
 				t = time(NULL);
 				charTime = ctime(&t);			
-				inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr),s, sizeof s);
-				myfile << "Received msg " << msg_num << ": " << decrypted << " from " << s << " at "<< charTime << "\n";	
-				myfile.close();
-				std::cout<< userName << " \n";		
+				myfile << "\nReceived msg (" << numbytes << ") " << msg_num << ": " << decrypted << " from " << s << " at "<< charTime;	
+				myfile << userName << " has just entered the group in slot " << slotNum++ << "\n";
+
+				//std::cout<< userName << " \n";		
 
 
 				// send ack to client along with list of active users
@@ -158,13 +162,20 @@ int main(void){
 							perror("\tUDP_Server: joined message to active users error");
 							exit(1); 
 							}
+						myfile << "Sent ack for " << userName << " to " << it->user << "\n";
 						}
-					}			
+					}
+				myfile.flush();
+				myfile.close();			
 				break;
 				}
 
 			case 2:{
 				// send back ack for msg 2
+				myfile.open("log.txt",std::fstream::app);
+				t = time(NULL);
+				charTime = ctime(&t);			
+				myfile << "\nRecieved (" << numbytes << " bytes) " << "msg " << msg_num << " " << decrypted << " from " << s << " at " << charTime;
 				msg1 = "ack;" + std::to_string(msg_num) + ";";	
 				message = new char[msg1.length() + 1];
 				strcpy(message, msg1.c_str());	
@@ -176,7 +187,8 @@ int main(void){
 				buddyName = getBuddyName(decrypted);
 				buddyMsg = getMessage(decrypted);	
 				//std::cout<< "message is " << buddyMsg << " \n";
-				
+				myfile << "Message is: " << buddyMsg;
+				myfile << "Sent message to: " << buddyName << " from: " << userName << "\n";
 
 				msg1 = "Message;2;";
 				msg_to_encrypt = "\nFrom: " + userName + " To: " + buddyName + "\n" + buddyMsg + "\n";
@@ -193,9 +205,14 @@ int main(void){
 						exit(1);
 						}
 					 }
+				myfile.close();	
 				break;					
 				}
 			case 3:{
+				myfile.open("log.txt", std::fstream::app);
+				t = time(NULL);
+				charTime = ctime(&t);
+				myfile << "\nRecieved (" << numbytes << " bytes) " << "msg " << msg_num << " " << decrypted << " from " << s << " at " << charTime;
 				msg1 = "ack;"+ std::to_string(msg_num) + ";";
 				msg_to_encrypt = "Goodbye, " + userName;
 				msgEncrypted = encryptMessage(msg_to_encrypt);
@@ -226,22 +243,18 @@ int main(void){
 						if((numbytes = sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)&(it->addr), addr_len)) == -1){
 						perror("\tUDP_Server: message3 sendto error");
 						exit(1);
-							}
+							}					
+						myfile << "Sent Goodbye for " << userName << " to " << it->user << "\n";
 						}
 					}
-
+				myfile.close();
 				break;
 				}
 			default:
-				printf("not 1 2 or 3");			
+				printf(" ");			
 			}
 		delete[] message;	
 		}
-
-		//for(std::vector<active_user>::iterator it = users.begin();it != users.end();it++){
-		//	std::cout<<"name " << it->user << std::endl;
-		//	}
-
 	close(sockfd);
 	return 0;
 }

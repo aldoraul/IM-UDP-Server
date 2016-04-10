@@ -1,0 +1,35 @@
+
+Received msg (12) 35573: 35573;1;aldo from 192.168.10.105 at Sat Apr  9 22:16:10 2016
+aldo has just entered the group in slot 1
+
+Received msg (13) 35556: 35556;1;david from 192.168.10.105 at Sat Apr  9 22:16:13 2016
+david has just entered the group in slot 2
+Sent ack for david to aldo
+
+Received msg (11) 35537: 35537;1;gil from 192.168.10.105 at Sat Apr  9 22:16:18 2016
+gil has just entered the group in slot 3
+Sent ack for gil to aldo
+Sent ack for gil to david
+
+Recieved (33 bytes) msg 35538 35538;2;gil
+aldo
+do this do that
+ from 192.168.10.105 at Sat Apr  9 22:16:28 2016
+Message is: do this do that
+Sent message to: aldo from: gil
+
+Recieved (27 bytes) msg 35574 35574;2;aldo
+david
+what???
+ from 192.168.10.105 at Sat Apr  9 22:16:49 2016
+Message is: what???
+Sent message to: david from: aldo
+
+Recieved (12 bytes) msg 35575 35575;3;aldo from 192.168.10.105 at Sat Apr  9 22:16:52 2016
+Sent Goodbye for aldo to david
+Sent Goodbye for aldo to gil
+
+Recieved (11 bytes) msg 35539 35539;3;gil from 192.168.10.105 at Sat Apr  9 22:16:56 2016
+Sent Goodbye for gil to david
+
+Recieved (13 bytes) msg 35557 35557;3;david from 192.168.10.105 at Sat Apr  9 22:17:02 2016
