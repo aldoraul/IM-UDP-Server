@@ -42,7 +42,8 @@ int main(void){
 	char* charTime;
 	std::ofstream myfile;
 	char s[INET6_ADDRSTRLEN];	
-
+	std::string ERROR1 = "Message type is invalid";
+	std::string ERROR2 = "We got message request, but buddy isn't logged in";
 	int sockfd;
 	struct addrinfo hints, *servinfo, *p;
 	int numbytes;
@@ -192,7 +193,19 @@ int main(void){
 						perror("\tUDP_Server: message to buddy error");
 						exit(1);
 						}
-					 }
+				}else{
+
+					msg1 = "Error;" + std::to_string(msg_num) + ";";
+					msgEncrypted = encryptMessage(ERROR2);
+					msg1 += msgEncrypted;
+					message = new char[msg1.length() + 1];
+					strcpy(message, msg1.c_str());
+					if((numbytes = sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)&their_addr, addr_len)) == -1){
+						perror("\tUDP_Server: sendto ERROR2");
+						exit(1);
+					
+						}
+					}
 				break;					
 				}
 			case 3:{
@@ -224,8 +237,8 @@ int main(void){
 				if(!users.empty()){
 					for(std::vector<active_user>::iterator it = users.begin();it != users.end();it++){
 						if((numbytes = sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)&(it->addr), addr_len)) == -1){
-						perror("\tUDP_Server: message3 sendto error");
-						exit(1);
+							perror("\tUDP_Server: message3 sendto error");
+							exit(1);
 							}
 						}
 					}
@@ -233,7 +246,16 @@ int main(void){
 				break;
 				}
 			default:
-				printf("not 1 2 or 3");			
+				
+				msg1 = "Error;" + std::to_string(msg_num) + ";";
+				msgEncrypted = encryptMessage(ERROR1);
+				msg1 += msgEncrypted;
+				message = new char[msg1.length()+1];
+				strcpy(message, msg1.c_str());
+				if((numbytes = sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)&their_addr, addr_len)) == -1){
+					perror("\tUDP_Server: error sending error msg");
+					exit(1);
+					}			
 			}
 		delete[] message;	
 		}
