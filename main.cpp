@@ -120,6 +120,9 @@ int main(void){
 		std::string buddyName = "";		// extracts user name of who the client wants to send a  message to
 		std::string buddyMsg = "";		// extracts body of msg to be sent to other client
  		
+		
+
+		inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr),s, sizeof s); // get client ip in readable form s
 			// switch statment based on which msg type is recevied
 		switch(msg_type){
 			case 1:{		// initial sign on msg
@@ -128,9 +131,8 @@ int main(void){
 				myfile.open("log.txt", std::fstream::app);	// open file to write to.  use app to append not open new file
 				t = time(NULL);		// get current date and time
 				charTime = ctime(&t);	// convert time to char		
-				inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr),s, sizeof s); // get client ip in readable form s
 				myfile << "Received msg " << msg_num << ": " << decrypted << " from " << s << " at "<< charTime << "\n";	
-				myfile.close();				// write info and close file of log
+				myfile << userName << " has just entered the group in slot " << slotNum++ << "\n";// write info to file of log
 				
 
 
@@ -165,14 +167,19 @@ int main(void){
 							perror("\tUDP_Server: joined message to active users error");
 							exit(1); 
 							}
+						
+						myfile << "Sent ack for " << userName << " to " << it->user << "\n"; 
 						}
-					}			
+					}
+				myfile.close();			
 				break;
 				}
 
 			case 2:{	// msg to send to buddy
 				// send back ack for msg type 2
-				msg1 = "ack;" + std::to_string(msg_num) + ";";	
+				myfile.open("log.txt",std::fstream::app);			
+				myfile << "\tRecieved (" << numbytes << " bytes) " << "msg " << msg_num << " " << decrypted << " from " << s << " at " << charTime;
+
 				message = new char[msg1.length() + 1];
 				strcpy(message, msg1.c_str());	
 				if((numbytes = sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)&their_addr, addr_len))==-1){
@@ -183,6 +190,9 @@ int main(void){
 				buddyName = getBuddyName(decrypted);	// if msg type 2, extract buddy name
 				buddyMsg = getMessage(decrypted);	// if msg type 2, extract buddy msg
 				
+				myfile << "Message is: " << buddyMsg;
+				myfile << "Sent message to: " << buddyName << " from: " << userName << "\n";
+		
 				std::vector<active_user>::iterator it = users.begin();
 				while(it->user != buddyName && it != users.end())	// search for buddy name in active user list
 					it++;
@@ -210,10 +220,15 @@ int main(void){
 					
 						}
 					}
+				myfile.close();
 				break;					
 				}
 			case 3:{	// sign off msg
-	
+				myfile.open("log.txt",std::fstream::app);
+				t = time(NULL);
+				charTime = ctime(&t);
+				myfile << "\nRecieved (" << numbytes << " bytes) " << "msg " << msg_num << " " << decrypted << " from " << s << " at " << charTime;
+
 				msg1 = "ack;"+ std::to_string(msg_num) + ";";	// send ack for receving msg
 				msg_to_encrypt = "Goodbye, " + userName;
 				msgEncrypted = encryptMessage(msg_to_encrypt);
@@ -245,9 +260,12 @@ int main(void){
 							perror("\tUDP_Server: message3 sendto error");
 							exit(1);
 							}
+
+						
+						myfile << "Sent Goodbye for " << userName << " to " << it->user << "\n";
 						}
 					}
-
+				myfile.close();
 				break;
 				}
 			default:	// if msg type number is not [1,2,3] send back error
