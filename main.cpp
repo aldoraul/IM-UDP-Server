@@ -109,7 +109,7 @@ int main(void){
 		int msg_num = getMsgNum(decrypted);	// returns msg num created by client.  reads 1st 5 chars from msg unless stay alive reply
 		std::string userName = get_user(decrypted);	// returns user name of client who sent message	
 
-		printf("user name is %s", userName);	// prints user name, msg type and msg num of each incoming message
+		printf("user name is %s", userName.c_str());	// prints user name, msg type and msg num of each incoming message
 		printf("msg type %d \n", msg_type);
 		printf("msg num  %d \n", msg_num);
 
@@ -125,7 +125,7 @@ int main(void){
 			case 1:{		// initial sign on msg
 				
 				
-				myfile.open("log.txt", std::fstream::aos);	// open file to write to.  use aos to append not open new file
+				myfile.open("log.txt", std::fstream::app);	// open file to write to.  use app to append not open new file
 				t = time(NULL);		// get current date and time
 				charTime = ctime(&t);	// convert time to char		
 				inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr),s, sizeof s); // get client ip in readable form s
